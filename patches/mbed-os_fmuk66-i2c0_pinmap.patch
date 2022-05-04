@@ -1,0 +1,28 @@
+--- mbed-os/targets/TARGET_Freescale/TARGET_MCUXpresso_MCUS/TARGET_K66F.orig/TARGET_FRDM/PeripheralPins.c	2022-05-03 10:48:25.115420101 +0200
++++ mbed-os/targets/TARGET_Freescale/TARGET_MCUXpresso_MCUS/TARGET_K66F/TARGET_FRDM/PeripheralPins.c	2022-05-03 10:48:25.139420317 +0200
+@@ -66,13 +66,15 @@
+ const PinMap PinMap_I2C_SDA[] = {
+     {PTD9 , I2C_0, 2},
+     {PTB3 , I2C_0, 2},
+-
++    
+     {PTC11, I2C_1, 2},
+ 
+     {PTA13, I2C_2, 5},
+ 
+     {PTE10, I2C_3, 2},
+ 
++    {PTE25, I2C_0, 5},
++
+     {NC   , NC   , 0}
+ };
+ 
+@@ -86,6 +88,8 @@
+ 
+     {PTE11, I2C_3, 2},
+ 
++    {PTE24, I2C_0, 5},
++
+     {NC   , NC   , 0}
+ };
+ 

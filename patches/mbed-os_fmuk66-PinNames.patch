@@ -1,0 +1,26 @@
+--- mbed-os/targets/TARGET_Freescale/TARGET_MCUXpresso_MCUS/TARGET_K66F.orig/TARGET_FRDM/PinNames.h	2022-05-03 10:48:25.115420101 +0200
++++ mbed-os/targets/TARGET_Freescale/TARGET_MCUXpresso_MCUS/TARGET_K66F/TARGET_FRDM/PinNames.h	2022-05-03 10:48:25.139420317 +0200
+@@ -195,9 +195,9 @@
+     PTE30 = (4 << GPIO_PORT_SHIFT | 30),
+     PTE31 = (4 << GPIO_PORT_SHIFT | 31),
+ 
+-    LED_RED   = PTC9,
+-    LED_GREEN = PTE6,
+-    LED_BLUE  = PTA11,
++    LED_RED   = PTD1,
++    LED_GREEN = PTC9,
++    LED_BLUE  = PTC8,
+ 
+     // mbed original LED naming
+     LED1 = LED_RED,
+@@ -206,8 +206,8 @@
+     LED4 = LED_RED,
+ 
+     //Push buttons
+-    SW2 = PTD11,
+-    SW3 = PTA10,
++    SW2 = PTE28,
++    SW3 = PTE28,
+     // Standardized button names
+     BUTTON1 = SW2,
+     BUTTON2 = SW3,

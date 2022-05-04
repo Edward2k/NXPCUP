@@ -1,0 +1,6 @@
+device MK66FN2M0XXX18
+si 1
+speed 4000
+reset
+go
+exit

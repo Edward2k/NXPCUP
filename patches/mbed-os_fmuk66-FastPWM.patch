@@ -1,0 +1,15 @@
+--- FastPWM/Device/FastPWM_KSDK.cpp.orig	2022-05-03 12:20:32.736571999 +0200
++++ FastPWM/Device/FastPWM_KSDK.cpp	2022-05-03 12:21:14.332984407 +0200
+@@ -1,4 +1,4 @@
+-#if defined(TARGET_KPSDK_MCUS)
++#if defined(TARGET_KPSDK_MCUS) || defined(TARGET_FMUK66) || defined(TARGET_K66F)
+ 
+ #include "FastPWM.h"
+ #include "fsl_ftm.h"
+@@ -85,4 +85,4 @@
+     PWM_SC = bin + clockbits;
+     return retval;   
+ }
+-#endif
+\ No newline at end of file
++#endif

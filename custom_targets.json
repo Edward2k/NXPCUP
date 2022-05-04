@@ -1,0 +1,15 @@
+{
+    "FMUK66": {
+        "inherits": [
+            "K66F"
+        ],
+        "device_name": "MK66FN2M0xxx18",
+        "macros_remove": [
+            "CPU_MK66FN2M0VMD18"
+        ],
+        "macros_add": [
+            "CPU_MK66FN2M0VLQ18"
+        ]
+        
+    }
+ }

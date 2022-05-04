@@ -1,0 +1,14 @@
+{
+    "target_overrides": {
+        "*": {
+            "drivers.uart-serial-txbuf-size": 128,
+            "platform.stdio-baud-rate": 115200,
+            "platform.stdio-buffered-serial": 1,
+            "target.printf_lib": "std",
+            "platform.error-all-threads-info": true,
+            "platform.stack-dump-enabled": true,
+            "platform.error-filename-capture-enabled": true,
+            "target.OUTPUT_EXT": "hex"
+        }
+    }
+}
