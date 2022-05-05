@@ -12,6 +12,13 @@ Follow the below steps chronologically.
 2) Our Git Repo 
 3) Jlink{EXE/RTT} -> For debugging
 
+### Installing MbedStudio on Linux
+
+1) Download MbedStudio here: https://os.mbed.com/studio/
+2) Give the file "MbedStudio-1.4.3.sh" execution rights: chmod +x MbedStudio-1.4.3.sh
+3) Execute the file to install MbedStudio: ./MbedStudio-1.4.3.sh
+4) Follow the installation instructions
+
 ### Preparing the project
 
 1) Open MbedStudio and perform setup (login and follow the tutorial if you like)
