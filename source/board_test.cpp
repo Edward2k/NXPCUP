@@ -2,44 +2,57 @@
 #include "board_fmuk66.h"
 #include "board_test.h"
 
+double get_pwm(double value, uint16_t center, uint16_t differ) {
+    if (value < -1.0) value = -1.0;
+    if (value >  1.0) value =  1.0;
+
+    double pwm_value = center + value * differ;
+    printf("pwm_value: %f\n", pwm_value);
+    return pwm_value;
+}
+
+void set_servo(double servo) {
+    double servo_pwm = get_pwm(servo, 2025, 325);
+    fmu_ch2.pulsewidth(servo_pwm/1000000U);
+    
+    // CAUTION: When using PwmOut() a delay of 1ms caused erratic servo behaviour which destroyed my plastic-gear servo - See comment on top of board_fmuk66.h about Mbed and PWM. 
+    //          DO NOT SET LOWER THAN, say, 10, when using PwmOut() instead of FastPWM.
+    const uint16_t sleep_delay = 10;
+    thread_sleep_for(sleep_delay);
+}
+
+void set_speed(double speed) {
+    double speed_pwm = get_pwm(speed, 1600, 400);
+    fmu_ch4.pulsewidth(speed_pwm/1000000U);
+    
+    const uint16_t sleep_delay = 10;
+    thread_sleep_for(sleep_delay);
+}
 
 // FIXME: change to FastPWM (see throttle_test on how to do that. Needs a scope to verify correct servo timing)
 void servo_test(void)
 {
-    uint16_t pw;
-    uint16_t loop;
-
     printf("* servo_test(): \n");
-
-    const uint16_t servo_min = 1250;
-    const uint16_t servo_center = 1500;
-    const uint16_t servo_max = 1750;
-    const uint8_t  step_size = 1;
-
-    // CAUTION: When using PwmOut() a delay of 1ms caused erratic servo behaviour which destroyed my plastic-gear servo - See comment on top of board_fmuk66.h about Mbed and PWM. 
-    //          DO NOT SET LOWER THAN, say, 10, when using PwmOut() instead of FastPWM.
-    const uint16_t delay = 5;           
-
     fmu_ch2.period(0.02);
-    fmu_ch2.pulsewidth((double)servo_center/1000000U * pw_mf);
+    set_servo(0.0); // center servo
+    
+    uint16_t loop;  
+    double pw;       
 
     // Go slowly
     printf("*    Slow:\n");
     for (loop=0; loop<2; loop++) {
         printf("*    C -> R\n");
-        for (pw=servo_center; pw<=servo_max; pw+=step_size) {
-            fmu_ch2.pulsewidth((double)pw/1000000U * pw_mf);
-            thread_sleep_for(delay);
+        for (pw=0.0; pw<=1.0; pw+=0.002) {
+            set_servo(pw);
         }
         printf("*    R -> L\n");
-        for (; pw>=servo_min; pw-=step_size) {
-            fmu_ch2.pulsewidth((double)pw/1000000U * pw_mf);
-            thread_sleep_for(delay);
+        for (; pw>=-1.0; pw-=0.002) {
+            set_servo(pw);
         }
         printf("*    L -> C\n");
-        for (; pw<=servo_center; pw+=step_size) {
-            fmu_ch2.pulsewidth((double)pw/1000000U * pw_mf);
-            thread_sleep_for(delay);
+        for (; pw<=0.0; pw+=0.002) {
+            set_servo(pw);
         }
     }
 
@@ -47,16 +60,16 @@ void servo_test(void)
     printf("*    Hard:\n");
     for (loop=0; loop<4; loop++) {
         printf("*    L\n");
-        fmu_ch2.pulsewidth((double)servo_min/1000000U * pw_mf);
+        set_servo(-1.0);
         thread_sleep_for(1000);
         printf("*    R\n");
-        fmu_ch2.pulsewidth((double)servo_max/1000000U * pw_mf);
+        set_servo( 1.0);
         thread_sleep_for(1000);
     }
 
     // Back to center
     printf("*    C\n");
-    fmu_ch2.pulsewidth((double)servo_center/1000000U * pw_mf);
+    set_servo( 0.0);
 
     printf("\n* end.\n");
 }
@@ -65,26 +78,12 @@ void servo_test(void)
 // FIXME: no reverse? -> probably caused by the buggy mbed PWM which caused the ESC to reprogram
 void throttle_test(void)
 {
-    uint16_t pw;
-    uint16_t loop;
-
     printf("* throttle_test():\n");
-
-    // There values are in microseconds
-    const uint16_t throttle_rev_max  = 1250;    // Maximum reverse (pedal to the metal)
-    const uint16_t throttle_rev_min  = 1400;    // Minimum reverse (just moving)
-    const uint16_t throttle_brake    = 1500;    // Brake
-    const uint16_t throttle_fw_min   = 1550;    // Minimum forward (just moving)
-    const uint16_t throttle_fw_max   = 1750;    // Maximum forward (floor it)
-
-//    FastPWM fmu_ch4(FMU_CH4_PIN, 64);         // prescaler 64 works for a period of 20ms
-//  fmu_ch4.period(0.02);                       // period 20ms is spot on
-    fmu_ch4.period(0.02 / pw_mf);               // FIXME: suddenly it's 16.67ms
-//  fmu_ch4.pulsewidth(0.0015);                 // pulsewidth in seconds is spot on
-    fmu_ch4.pulsewidth(0.0015 / pw_mf);         // FIXME: also not correct
+    // FastPWM fmu_ch4(FMU_CH4_PIN, 64); // prescaler 64 works for a period of 20ms
+    fmu_ch4.period(0.02);
 
     // Start with brake mode (ESC should stop beeping since there is a servo signal present)
-    fmu_ch4.pulsewidth((double)throttle_brake/1000000U / pw_mf);
+    set_speed(0.0);
 
     // Give the ESC some time to play it's startup tune
     thread_sleep_for(4000);
@@ -99,22 +98,21 @@ void throttle_test(void)
 
     // WARNING: Motor will run in this loop!
     for (loop=0; loop<4; loop++) {
-        printf("*    fw_min=%d  mf'd=%f\n", throttle_fw_min, (double)throttle_fw_min/1000000U / pw_mf);
-        fmu_ch4.pulsewidth((double)throttle_fw_min/1000000U / pw_mf);
+        printf("*    half speed = 0.5\n");
+        set_speed(0.5);
         thread_sleep_for(5000);
 
-        printf("*    brake=%d, mf'd=%f\n", throttle_brake, (double)throttle_brake/1000000U / pw_mf);
-        fmu_ch4.pulsewidth((double)throttle_brake/1000000U / pw_mf);
+        printf("*    brake = 0.0\n");
+        set_speed(0.0);
         thread_sleep_for(5000);
 
-        printf("*    rev_min=%d, mf=%f\n", throttle_rev_min, (double)throttle_rev_min/1000000U / pw_mf);
-        fmu_ch4.pulsewidth((double)throttle_rev_min/1000000U / pw_mf);
+        printf("*    half reverse = -0.5\n");
+        set_speed(-0.5);
         thread_sleep_for(5000);
     }
 
     // End with brake mode
-    printf("*    brake=%d\n", throttle_brake);
-    printf("*    brake=%d, mf'd=%f\n", throttle_brake, (double)throttle_brake/1000000U / pw_mf);
+    set_speed(0.0);
     thread_sleep_for(1000);
     printf("* end.\n");
     ui_led_red = 0;
