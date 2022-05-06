@@ -28,10 +28,11 @@ Follow the below steps chronologically.
 
 ### Preparing the project
 
-1) Open MbedStudio and perform setup (login and follow the tutorial if you like)
-2) Open a `New Workspace`, and open the repository of the the git repo just cloned
-3) At the bottom of MbedStudio, you'll see a list of libraries. You'll see the `fix` icon warning you out-of-sync libraries. Press Fix and let them install. 
-4) Apply the patches. To do so, copy and paste the following commands from the top-directory of the repo.
+1) Do not plug in the car via USB yet
+2) Open MbedStudio and perform setup (login and follow the tutorial if you like)
+3) Click on `Open Workspace` and open the repository of the the git repo just cloned
+4) At the bottom of MbedStudio, you'll see a list of libraries. You'll see the `fix` icon warning you out-of-sync libraries. Press Fix and let them install. 
+5) Apply the patches. To do so, copy and paste the following commands from the top-directory of the repo.
 ```bash
 cd FastPWM
 git apply ../patches/mbed-os_fmuk66-FastPWM.patch
@@ -40,22 +41,21 @@ git apply ../patches/mbed-os_fmuk66-i2c0_pinmap.patch
 git apply ../patches/mbed-os_fmuk66-PinNames.patch 
 cd ..
 ```
-5) Hit the hammer icon to build the project. You'll know it worked if the output pane reads 
+6) Plug in the car via the JLink USB cable. The car should be automatically recognized by MbedStudio.
+7) Hit the hammer icon on the left side to build the project. This is will likely take a long time the first time as it is compiling an entire OS for the target. Subsequent builds will be much faster. You'll know it worked if the output pane reads 
 ```none
-Total Static RAM memory (data + bss): 12942(+4) bytes
-Total Flash memory (text + data): 72159(+510) bytes
-Image: BUILD/K66F/ARMC6/NXP.hex
+Total Static RAM memory (data + bss): 12942(+12942) bytes
+Total Flash memory (text + data): 72159(+72159) bytes
+Image: BUILD/FMUK66/ARMC6/NXP.hex
 ```
+
+### Flashing the program
+
+1) Top left, click Terminal > New Terminal
+2) Execute the command `JLinkExe jlink/jflash.jlink`
+3) Your program should immediately start running on the car
 
 ## FAQ
 
 ### Where do I write my code?
 In `source -> main.c` We are currently making a nice "write and play" environment. We will update the README accordingly.
-
-### How do I build the project?
-On the right-hand-side of MbedStudio, you'll find a hammer Icon. Hit that and let it build. This is will likely take a long time the first time as it is compiling an entire OS for the target.
-Subsequent builds will be much faster.
-
-### How do I flash the program?
-... -> We are making some scripts to automate this. 
-
