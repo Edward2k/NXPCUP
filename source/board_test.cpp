@@ -87,6 +87,8 @@ void throttle_test(void)
 
     // Give the ESC some time to play it's startup tune
     thread_sleep_for(4000);
+    
+    uint16_t loop;  
 
     // Warning LED
     for(loop=0; loop<20; loop++) {
