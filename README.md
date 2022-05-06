@@ -19,6 +19,13 @@ Follow the below steps chronologically.
 3) Execute the file to install MbedStudio: `./MbedStudio-1.4.3.sh`
 4) Follow the installation instructions
 
+### Setting up JLink
+
+1) Download the Linux 64-bit DEB Installer here: https://www.segger.com/downloads/jlink
+2) Execute the file to install JLink: `sudo apt install ./JLink_Linux_V764d_x86_64.deb`
+3) If you get the warning `Download is performed unsandboxed as root as file...`, that is fine
+4) Set up the JLink cable as described here: https://nxp.gitbook.io/nxp-cup/mr-buggy3-developer-guide/mr-buggy3-software-setup#connect-our-fmu-and-j-link-debugging-interface-to-our-computer
+
 ### Preparing the project
 
 1) Open MbedStudio and perform setup (login and follow the tutorial if you like)
