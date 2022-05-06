@@ -1,7 +1,7 @@
 device MK66FN2M0XXX18
 si 1
 speed 4000
-loadbin BUILD/FMUK66/ARMC6/fmuk66-template-02.hex 0x0
+loadbin BUILD/FMUK66/ARMC6/NXPCUP.hex 0x0
 halt
 reset
 exit
