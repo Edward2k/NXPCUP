@@ -59,20 +59,19 @@ int main()
         RNGA_GetRandomData(RNG, rng_data, 1);
         printf("* RNG: %08X\n", rng_data[0]);
 
-        // Pixy camera init
+        wait_for_safety_switch();
         Pixy2 *pixy = new Pixy2();
         pixy->init();
         pixy->test();
         Pixy2Features pf = Pixy2Features(*pixy);
-        // printf("set mode\n");
-        // pf.setMode(LINE_VECTOR);
-        printf("get features\n");
         pf.getAllFeatures();
         printf("Counted %d vectors\n", pf.numVectors);
         for (int i = 0; i < pf.numVectors; i++) {
             pf.vectors[i].print(); 
             printf("\n");       
         }
+        printf("* End Pixy test\n");
+
         wait_for_safety_switch();
         servo_test();
 
