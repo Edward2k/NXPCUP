@@ -67,8 +67,12 @@ int main()
         // printf("set mode\n");
         // pf.setMode(LINE_VECTOR);
         printf("get features\n");
-        printf("EDU RES IS %d\n", pf.getMainFeatures());
-        // pf.get_features(LINE_REQUEST_GET_FEATURES);
+        pf.getAllFeatures();
+        printf("Counted %d vectors\n", pf.numVectors);
+        for (int i = 0; i < pf.numVectors; i++) {
+            pf.vectors[i].print(); 
+            printf("\n");       
+        }
         wait_for_safety_switch();
         servo_test();
 
