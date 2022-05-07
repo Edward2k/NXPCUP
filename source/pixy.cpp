@@ -163,12 +163,90 @@ uint8_t Pixy2::send_msg() {
 }
 
 uint8_t Pixy2::recv_msg(uint8_t *data) {
-    uint8_t res = recv(data, 2);
+  uint16_t csCalc, csSerial;
+  int16_t res;
+  
+  res = sync();
+  if (res<0)
+    printf("SYNC FAILED!\n");
+
+  if (m_cs)
+  {
+    printf("cs bby\n");
+    res = recv(&data, 4);
     if (res<0)
       return res;
 
     m_type = data[0];
     m_length = data[1];
 
-    return recv(data, m_length);
+    csSerial = *(uint16_t *)&data[2];
+
+    res = recv(data, m_length);
+    if (res<0)
+      return res;
+
+    //TODO Checksum check
+  }
+  else
+  {   
+    res = recv(data, 2);
+    if (res<0)
+      return res;
+
+    m_type = data[0];
+    m_length = data[1];
+
+    res = recv(data, m_length);
+    if (res<0)
+      return res;
+  }
+  return PIXY_RESULT_OK;
+}
+
+int16_t Pixy2::sync()
+{
+  uint8_t i, j, c, cprev;
+  int16_t res;
+  uint16_t start;
+  
+  // parse bytes until we find sync
+  for(i=j=0, cprev=0; true; i++)
+  {
+    res = recv(&c, 1);
+    if (res>=PIXY_RESULT_OK)
+    {
+      // since we're using little endian, previous byte is least significant byte
+      start = cprev;
+      // current byte is most significant byte
+      start |= c << 8;
+      cprev = c;
+      if (start==PIXY_CHECKSUM_SYNC)
+      {
+        m_cs = true;
+        return PIXY_RESULT_OK;
+      }
+      if (start==PIXY_NO_CHECKSUM_SYNC)
+      {
+        m_cs = false;
+        return PIXY_RESULT_OK;
+      }
+    }
+	  // If we've read some bytes and no sync, then wait and try again.
+	  // And do that several more times before we give up.  
+	  // Pixy guarantees to respond within 100us.
+    if (i>=4)
+    {
+      if (j>=4)
+      {
+#ifdef PIXY_DEBUG
+        printf("error: no response\n");
+#endif		  
+        return PIXY_RESULT_ERROR;
+      }
+      thread_sleep_for(25); 
+      j++;
+      i = 0;
+    }
+  }
 }

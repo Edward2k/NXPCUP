@@ -64,8 +64,8 @@ int main()
         pixy->init();
         pixy->test();
         Pixy2Features pf = Pixy2Features(*pixy);
-        printf("set mode\n");
-        pf.setMode(LINE_VECTOR);
+        // printf("set mode\n");
+        // pf.setMode(LINE_VECTOR);
         printf("get features\n");
         printf("EDU RES IS %d\n", pf.getMainFeatures());
         // pf.get_features(LINE_REQUEST_GET_FEATURES);

@@ -37,13 +37,15 @@ public:
 
 private:
     I2C *pixy_interface = &i2c_pixy;
-    uint8_t send(uint8_t *data, uint8_t len);
-    uint8_t recv(uint8_t *data, uint8_t len);
+    uint8_t send(uint8_t *data, uint8_t len); /* At link level */
+    uint8_t recv(uint8_t *data, uint8_t len); /* At link level */
+    int16_t sync();
 
     uint8_t m_maxlen = 128;
-    uint8_t *m_bufPayload;
-    int8_t m_type;
-    uint8_t m_length;
+    uint8_t *m_bufPayload = NULL;
+    int8_t m_type = 0;
+    uint8_t m_length = 0;
+    uint8_t m_cs = 0; /* for checksum */
         
 };
 

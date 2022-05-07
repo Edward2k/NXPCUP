@@ -205,7 +205,7 @@ int8_t Pixy2Features::getFeatures(uint8_t type,  uint8_t features, bool wait)
 		    // if it's not a busy response, return the error
         if ((int8_t)data[0]!=PIXY_RESULT_BUSY)
 		      return data[0];
-	      else if (!wait) // we're busy
+	    else if (!wait) // we're busy
           return PIXY_RESULT_BUSY; // new data not available yet
       }
     }
