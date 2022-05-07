@@ -103,7 +103,7 @@ uint8_t Pixy2::send(uint8_t *data, uint8_t len)
 
 
 // @brief   Receive data from Pixy
-uint8_t Pixy2::recv(uint8_t *data, uint8_t len)
+uint8_t Pixy2::recv(uint8_t *data, uint8_t len, uint16_t *cs)
 {
     int ack;            // with write: 0=NAK, 1=ACK, 2=timeout
     uint8_t rxn=0;      // nr of received bytes
@@ -116,6 +116,8 @@ uint8_t Pixy2::recv(uint8_t *data, uint8_t len)
 
     // send ADDRESS in READ mode and continue when ACK received
     printf("*    write addr=0x%02X (7b: 0x%02x)\n", PIXY_ADDR | kI2C_Read, PIXY_ADDR>>1);
+    if (cs)
+        *cs = 0;
     if ( pixy_interface->write(PIXY_ADDR | kI2C_Read)) 
     {
         printf("*    ack rcvd on addr\n");
@@ -129,6 +131,8 @@ uint8_t Pixy2::recv(uint8_t *data, uint8_t len)
             data[i] = pixy_interface->read(ack);     // 1 = acknowledge received data. Last read should have ACK=0
             printf("0x%hhx\n", data[i]);
             rxn++;
+            if (cs)
+                *cs += data[i];
         }
     } else {
         printf("*    NO ack rcvd on addr\n");
@@ -183,11 +187,16 @@ uint8_t Pixy2::recv_msg(uint8_t *data) {
 
     csSerial = *(uint16_t *)&data[2];
 
-    res = recv(data, m_length);
+    res = recv(data, m_length, &csCalc);
     if (res<0)
       return res;
 
-    //TODO Checksum check
+    if (csSerial!=csCalc)
+    {
+      printf("error: checksum (got : %d, expected %d)\n", csCalc, csSerial);
+      return PIXY_RESULT_CHECKSUM_ERROR;
+    }
+
   }
   else
   {   
