@@ -29,14 +29,8 @@
 
 #define LINE_MAX_INTERSECTION_LINES              6
 
-/**
-* Simple codes
-**/
-enum PIXY_RET_CODES {
-    PIXY_RESULT_SUCCESS = 0,
-    PIXY_RESULT_BUSY = 1,
-    PIXY_RESULT_ERROR = 2,
-};
+//responses
+#define PIXY_TYPE_RESPONSE_RESULT            0x01
 
 /**
 * Feature definitions
@@ -46,9 +40,7 @@ struct Vector
 {
   void print()
   {
-    char buf[64];
-    sprintf(buf, "vector: (%d %d) (%d %d) index: %d flags %d", m_x0, m_y0, m_x1, m_y1, m_index, m_flags);
-	  Serial.println(buf);
+    printf("vector: (%d %d) (%d %d) index: %d flags %d", m_x0, m_y0, m_x1, m_y1, m_index, m_flags);
   }
   
   uint8_t m_x0;
@@ -107,13 +99,17 @@ struct Barcode
 
 class Pixy2Features {
 public:
-    Pixy2Features(I2C *i2c_pixy)
+    Pixy2Features(Pixy2 pixy)
     {
         m_pixy = pixy;
-    }	  
+    }
+    Pixy2Features() {
+        m_pixy = Pixy2();
+    }
     
     int8_t getMainFeatures(uint8_t features=LINE_ALL_FEATURES, bool wait=true)
     {
+        printf("Getting main features\n");
         return getFeatures(LINE_GET_MAIN_FEATURES, features, wait); 
     }
     
@@ -139,7 +135,7 @@ public:
 
 private:
     int8_t getFeatures(uint8_t type, uint8_t features, bool wait);
-    I2C *i2c_pixy;
+    Pixy2 m_pixy;
     
 };
 
@@ -154,6 +150,7 @@ int8_t Pixy2Features::getFeatures(uint8_t type,  uint8_t features, bool wait)
 {
   int8_t res;
   uint8_t offset, fsize, ftype, *fdata;
+  uint8_t data[1024];
   
   vectors = NULL;
   numVectors = 0;
@@ -166,20 +163,20 @@ int8_t Pixy2Features::getFeatures(uint8_t type,  uint8_t features, bool wait)
   {
     // fill in request data
     uint8_t msg[2] = {type, features};
-    Pixy_Msg msg = Pixy_Msg(LINE_REQUEST_GET_FEATURES, 2, &msg);
+    m_pixy.prepare_msg(LINE_REQUEST_GET_FEATURES, 2, msg);
  
     // send request
-    m_pixy->sendPacket();
-    if (m_pixy->recvPacket()==0)
+    m_pixy.send_msg();
+    if (m_pixy.recv_msg(data)==0)
     {     
-      if (m_pixy->m_type==LINE_RESPONSE_GET_FEATURES)
+      if (m_pixy.get_type()==LINE_RESPONSE_GET_FEATURES)
       {
         // parse line response
-		    for (offset=0, res=0; m_pixy->m_length>offset; offset+=fsize+2)
+		for (offset=0, res=0; m_pixy.get_len()>offset; offset+=fsize+2)
         {
-          ftype = m_pixy->m_buf[offset];
-          fsize = m_pixy->m_buf[offset+1];
-          fdata = &m_pixy->m_buf[offset+2]; 
+          fsize = data[offset+1];
+          ftype = data[offset];
+          fdata = &data[offset+2]; 
           if (ftype==LINE_VECTOR)
           {
             vectors = (Vector *)fdata;
@@ -203,22 +200,41 @@ int8_t Pixy2Features::getFeatures(uint8_t type,  uint8_t features, bool wait)
         }
         return res;
       }
-      else if (m_pixy->m_type==PIXY_TYPE_RESPONSE_ERROR)
+      else if (m_pixy.get_type()==PIXY_RESULT_RESPONSE_ERROR)
       {
 		    // if it's not a busy response, return the error
-        if ((int8_t)m_pixy->m_buf[0]!=PIXY_RESULT_BUSY)
-		      return m_pixy->m_buf[0];
+        if ((int8_t)data[0]!=PIXY_RESULT_BUSY)
+		      return data[0];
 	      else if (!wait) // we're busy
           return PIXY_RESULT_BUSY; // new data not available yet
       }
     }
     else
-      return PIXY_RESULT_ERROR;  // some kind of bitstream error
-  
-    // If we're waiting for frame data, don't thrash Pixy with requests.
-    // We can give up half a millisecond of latency (worst case)	
-    delayMicroseconds(500);
+        printf("ERROR\n");
+        return PIXY_RESULT_ERROR;  // some kind of bitstream error
+    
+        // If we're waiting for frame data, don't thrash Pixy with requests.
+        // We can give up half a millisecond of latency (worst case)	
+        thread_sleep_for(500);
   }
 }
 
+int8_t Pixy2Features::setMode(uint8_t mode)
+{
+  uint32_t res;
+  uint8_t recvbuffer[1024];
+  uint8_t buf[1];
+  buf[0] = mode;
+  m_pixy.prepare_msg(LINE_REQUEST_SET_MODE, 1, &(buf[0]));
+  m_pixy.send_msg();
+  if (m_pixy.recv_msg(recvbuffer)!=0 && m_pixy.get_type()==PIXY_TYPE_RESPONSE_RESULT && m_pixy.get_len()==4)
+  {
+    res = *(uint32_t *)recvbuffer;
+    return (int8_t)res;	
+  }
+  else
+      printf("ERROR::PIXY2FEATURE::setMODE \n\r");
+      return PIXY_RESULT_ERROR;  // some kind of bitstream error
+}
 
+#endif /* _PIXY2LINE_H */

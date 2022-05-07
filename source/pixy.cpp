@@ -127,7 +127,7 @@ uint8_t Pixy2::recv(uint8_t *data, uint8_t len)
            }
             printf("*    i=%2d, ack=%d, data=", i, ack);
             data[i] = pixy_interface->read(ack);     // 1 = acknowledge received data. Last read should have ACK=0
-            printf("0x%02X\n", data[i]);
+            printf("0x%hhx\n", data[i]);
             rxn++;
         }
     } else {
@@ -153,11 +153,22 @@ uint8_t Pixy2::send_msg() {
     uint8_t buf[m_maxlen];
     memset(buf, 0, m_maxlen);
     // write header info at beginnig of buffer
-    buf[0] = PIXY_NO_CHECKSUM_SYNC & 0xff;
-    buf[1] = PIXY_NO_CHECKSUM_SYNC >> 8;
+    buf[0] = PIXY_CHECKSUM_SYNC & 0xff;
+    buf[1] = PIXY_CHECKSUM_SYNC >> 8;
     buf[2] = m_type;
     buf[3] = m_length + 4;
     memcpy(buf + 4, m_bufPayload, m_maxlen-4);
-    send(buf, m_length);
-    return 0;
+    send(buf, m_length+4);
+    return PIXY_RESULT_OK;
+}
+
+uint8_t Pixy2::recv_msg(uint8_t *data) {
+    uint8_t res = recv(data, 2);
+    if (res<0)
+      return res;
+
+    m_type = data[0];
+    m_length = data[1];
+
+    return recv(data, m_length);
 }

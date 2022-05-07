@@ -4,6 +4,8 @@
 //#include "mbed_thread.h"
 #include "pixy.h"
 #include "board_test.h"
+#include "pixyfeatures.h"
+
 
 // Used libraries:
 // - Debug output on the Segger probe (just install and it should work on the Segger RTT terminal)
@@ -61,6 +63,12 @@ int main()
         Pixy2 *pixy = new Pixy2();
         pixy->init();
         pixy->test();
+        Pixy2Features pf = Pixy2Features(*pixy);
+        printf("set mode\n");
+        pf.setMode(LINE_VECTOR);
+        printf("get features\n");
+        printf("EDU RES IS %d\n", pf.getMainFeatures());
+        // pf.get_features(LINE_REQUEST_GET_FEATURES);
         wait_for_safety_switch();
         servo_test();
 
