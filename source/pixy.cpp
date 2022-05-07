@@ -153,10 +153,11 @@ uint8_t Pixy2::send_msg() {
     uint8_t buf[m_maxlen];
     memset(buf, 0, m_maxlen);
     // write header info at beginnig of buffer
-    buf[0] = PIXY_CHECKSUM_SYNC & 0xff;
-    buf[1] = PIXY_CHECKSUM_SYNC >> 8;
+    printf("About to send msg");
+    buf[0] = 0xae;//PIXY_CHECKSUM_SYNC & 0xff;
+    buf[1] = 0xc1;//PIXY_CHECKSUM_SYNC >> 8;
     buf[2] = m_type;
-    buf[3] = m_length + 4;
+    buf[3] = m_length;
     memcpy(buf + 4, m_bufPayload, m_maxlen-4);
     send(buf, m_length+4);
     return PIXY_RESULT_OK;
@@ -173,7 +174,7 @@ uint8_t Pixy2::recv_msg(uint8_t *data) {
   if (m_cs)
   {
     printf("cs bby\n");
-    res = recv(&data, 4);
+    res = recv(data, 4);
     if (res<0)
       return res;
 

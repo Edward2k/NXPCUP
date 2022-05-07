@@ -205,7 +205,7 @@ int8_t Pixy2Features::getFeatures(uint8_t type,  uint8_t features, bool wait)
 		    // if it's not a busy response, return the error
         if ((int8_t)data[0]!=PIXY_RESULT_BUSY)
 		      return data[0];
-	    else if (!wait) // we're busy
+	      else if (!wait) // we're busy
           return PIXY_RESULT_BUSY; // new data not available yet
       }
     }
@@ -225,7 +225,7 @@ int8_t Pixy2Features::setMode(uint8_t mode)
   uint8_t recvbuffer[1024];
   uint8_t buf[1];
   buf[0] = mode;
-  m_pixy.prepare_msg(LINE_REQUEST_SET_MODE, 1, &(buf[0]));
+  m_pixy.prepare_msg(LINE_REQUEST_SET_MODE, 1, buf);
   m_pixy.send_msg();
   if (m_pixy.recv_msg(recvbuffer)!=0 && m_pixy.get_type()==PIXY_TYPE_RESPONSE_RESULT && m_pixy.get_len()==4)
   {
