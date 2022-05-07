@@ -5,6 +5,7 @@
 void pulsewidth_test(void);
 void servo_test(void);
 void throttle_test(void);
+void test_pixy(void);
 
 
 #endif

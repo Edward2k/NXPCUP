@@ -4,6 +4,8 @@
 //#include "mbed_thread.h"
 #include "pixy.h"
 #include "board_test.h"
+#include "pixyfeatures.h"
+
 
 // Used libraries:
 // - Debug output on the Segger probe (just install and it should work on the Segger RTT terminal)
@@ -16,7 +18,23 @@
 //      - http://os.mbed.com/users/Sissors/code/FastPWM/
 
 
-void wait_for_safety_switch(void);
+void wait_for_safety_switch(void) {
+    printf("* --- Press safety switch to continue ---\n");
+    buzz(1800, 100);
+
+    // Wait for release (if it is still pressed)
+    while( safety_switch);
+    // Debounce
+    thread_sleep_for(100);
+
+    // Flash safety LED while waiting for switch
+    while( !safety_switch ) {
+        nsafety_led = 0;
+        thread_sleep_for(100);
+        nsafety_led = 1;
+        thread_sleep_for(100);
+    }  
+}
 
 //
 //      M A I N
@@ -41,10 +59,18 @@ int main()
         RNGA_GetRandomData(RNG, rng_data, 1);
         printf("* RNG: %08X\n", rng_data[0]);
 
-        // Pixy camera init
-        i2c_pixy.frequency(400000);     // 400kHz
-        pixy_init();
-        pixy_test();
+        wait_for_safety_switch();
+        Pixy2 *pixy = new Pixy2();
+        pixy->init();
+        pixy->test();
+        Pixy2Features pf = Pixy2Features(*pixy);
+        pf.getAllFeatures();
+        printf("Counted %d vectors\n", pf.numVectors);
+        for (int i = 0; i < pf.numVectors; i++) {
+            pf.vectors[i].print(); 
+            printf("\n");       
+        }
+        printf("* End Pixy test\n");
 
         wait_for_safety_switch();
         servo_test();
@@ -52,28 +78,6 @@ int main()
         wait_for_safety_switch();
         throttle_test();
     }
-}
-
-
-
-// @brief       Wait for press on safety switch
-void wait_for_safety_switch(void)
-{
-    printf("* --- Press safety switch to continue ---\n");
-    buzz(1800, 100);
-
-    // Wait for release (if it is still pressed)
-    while( safety_switch);
-    // Debounce
-    thread_sleep_for(100);
-
-    // Flash safety LED while waiting for switch
-    while( !safety_switch ) {
-        nsafety_led = 0;
-        thread_sleep_for(100);
-        nsafety_led = 1;
-        thread_sleep_for(100);
-    }        
 }
 
 
