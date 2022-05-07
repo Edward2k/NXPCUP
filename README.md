@@ -26,6 +26,14 @@ Follow the below steps chronologically.
 3) If you get the warning `Download is performed unsandboxed as root as file...`, that is fine
 4) Set up the JLink cable as described here: https://nxp.gitbook.io/nxp-cup/mr-buggy3-developer-guide/mr-buggy3-software-setup#connect-our-fmu-and-j-link-debugging-interface-to-our-computer
 
+### Setting up the Pixy2
+
+1) Install PixyMon as described here: https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:installing_pixymon_on_linux
+2) If you get the error: `Package 'qt5-default' has no installation candidate`, pls try `sudo apt install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools`
+3) If PixyMon does not recognize the Pixy2, you might have to restart your pc for the Pixy2 permissions to take effect
+4) Select Program > line_tracking
+5) Select Configure Parameters to tweak the settings for the Pixy2. You want your Pixy2 to recognize the black line as stable as possible. Also make sure to set the Interface > Data out port to I2C.
+
 ### Preparing the project
 
 1) Do not plug in the car via USB yet
