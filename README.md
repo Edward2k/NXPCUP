@@ -49,7 +49,8 @@ git apply ../patches/mbed-os_fmuk66-i2c0_pinmap.patch
 git apply ../patches/mbed-os_fmuk66-PinNames.patch 
 cd ..
 ```
-6) Plug in the car via the JLink USB cable. The car should be automatically recognized by MbedStudio.
+If you get the warning `warning: 1 line adds whitespace errors.`, that is fine
+6) Plug in the car via the JLink USB cable. The car should be automatically recognized by MbedStudio. If not, select `FMUK66` as target on the left side.
 7) Hit the hammer icon on the left side to build the project. This is will likely take a long time the first time as it is compiling an entire OS for the target. Subsequent builds will be much faster. You'll know it worked if the output pane reads 
 ```none
 Total Static RAM memory (data + bss): 12942(+12942) bytes
