@@ -16,7 +16,23 @@
 //      - http://os.mbed.com/users/Sissors/code/FastPWM/
 
 
-void wait_for_safety_switch(void);
+void wait_for_safety_switch(void) {
+    printf("* --- Press safety switch to continue ---\n");
+    buzz(1800, 100);
+
+    // Wait for release (if it is still pressed)
+    while( safety_switch);
+    // Debounce
+    thread_sleep_for(100);
+
+    // Flash safety LED while waiting for switch
+    while( !safety_switch ) {
+        nsafety_led = 0;
+        thread_sleep_for(100);
+        nsafety_led = 1;
+        thread_sleep_for(100);
+    }  
+}
 
 //
 //      M A I N
@@ -42,38 +58,15 @@ int main()
         printf("* RNG: %08X\n", rng_data[0]);
 
         // Pixy camera init
-        i2c_pixy.frequency(400000);     // 400kHz
-        pixy_init();
-        pixy_test();
-
+        Pixy2 *pixy = new Pixy2();
+        pixy->init();
+        pixy->test();
         wait_for_safety_switch();
         servo_test();
 
         wait_for_safety_switch();
         throttle_test();
     }
-}
-
-
-
-// @brief       Wait for press on safety switch
-void wait_for_safety_switch(void)
-{
-    printf("* --- Press safety switch to continue ---\n");
-    buzz(1800, 100);
-
-    // Wait for release (if it is still pressed)
-    while( safety_switch);
-    // Debounce
-    thread_sleep_for(100);
-
-    // Flash safety LED while waiting for switch
-    while( !safety_switch ) {
-        nsafety_led = 0;
-        thread_sleep_for(100);
-        nsafety_led = 1;
-        thread_sleep_for(100);
-    }        
 }
 
 
