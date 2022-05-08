@@ -69,7 +69,7 @@ Image: BUILD/FMUK66/ARMC6/NXP.hex
 If you want to debug your program and find out where your code goes wrong or you simply want to see what values your car prints then follow these instructions.
 
 1) The following steps can either be done in your default terminal or in an MbedStudio terminal by selecting Terminal > New Terminal.
-2) Open a new Terminal and run `JLinkRTTViewerExe`
+2) Open a new Terminal, run `JLinkRTTViewerExe` and use these parameters: `USB`, `MK66FN2M0XXX18`, `SWD`, `4000kHz`
 3) Open a new Terminal, run `JLinkExe` and connect to the car: `connect`, `MK66FN2M0XXX18`, `S`, `4000`
 4) As soon as you flash a new program on the car, it should automatically appear in JLinkRTTViewerExe
 
