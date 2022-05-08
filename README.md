@@ -58,6 +58,14 @@ Total Flash memory (text + data): 72159(+72159) bytes
 Image: BUILD/FMUK66/ARMC6/NXP.hex
 ```
 
+### Writing your algorithm
+
+1) Your algorithm can be written in the main() function, look at the comment in the code.
+2) The documentation for what the vectors look like can be found here: https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:line_api
+3) Make use of either one or multiple vectors to calculate the angle and/or the speed. The speed can also just be a constant number.
+4) Both the value for the servo and the one for the motor are double between -1.0 and 1.0. In case of the servo -1.0 means right and 1.0 means left. In case of the motor -1.0 means backward and 1.0 means forward.
+5) You have to adjust the PWM values for both the servo and the motor in the board_test.cpp file where it says `get_pwm(servo, 1750, 325)` and `get_pwm(speed, 1600, 400);`. You can make use of the functions test_servo() and throttle_test() for this.
+
 ### Flashing the program
 
 1) Top left, click Terminal > New Terminal
@@ -68,12 +76,6 @@ Image: BUILD/FMUK66/ARMC6/NXP.hex
 
 If you want to debug your program and find out where your code goes wrong or you simply want to see what values your car prints then follow these instructions.
 
-1) The following steps can either be done in your default terminal or in an MbedStudio terminal by selecting Terminal > New Terminal.
+1) The following step can either be done in your default terminal or in an MbedStudio terminal by selecting Terminal > New Terminal.
 2) Open a new Terminal, run `JLinkRTTViewerExe` and use these parameters: `USB`, `MK66FN2M0XXX18`, `SWD`, `4000kHz`
-3) Open a new Terminal, run `JLinkExe` and connect to the car: `connect`, `MK66FN2M0XXX18`, `S`, `4000`
 4) As soon as you flash a new program on the car, it should automatically appear in JLinkRTTViewerExe
-
-## FAQ
-
-### Where do I write my code?
-In `source -> main.c` We are currently making a nice "write and play" environment. We will update the README accordingly.
