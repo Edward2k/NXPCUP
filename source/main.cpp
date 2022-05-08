@@ -92,7 +92,7 @@ int main()
             calculate servo position and motor speed here
         */
 
-        set_servo(0.0); // [left, right] = [1.0, -1.0]
+        set_servo(0.0); // [right, left] = [-1.0, 1.0]
         set_speed(0.0); // [reverse, forward] = [-1.0, 1.0]
     }
 }
