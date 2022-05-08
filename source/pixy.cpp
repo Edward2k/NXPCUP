@@ -81,13 +81,13 @@ uint8_t Pixy2::send(uint8_t *data, uint8_t len)
     {
         printf("*    ack rcvd on addr\n");
         for (i=0; i<len; i++) {
-            printf("*    i=%2d, data=0x%02x, ", i, data[i]);
+            // printf("*    i=%2d, data=0x%02x, ", i, data[i]);
             if ( (pixy_interface->write(data[i]) )) {
-                printf("ACK\n");
+                // printf("ACK\n");
                 txn++;               
             } else {
                 // Abort if no ACK received
-                printf("NAK\n");
+                // printf("NAK\n");
                 break;
             }
         }
@@ -127,9 +127,9 @@ uint8_t Pixy2::recv(uint8_t *data, uint8_t len, uint16_t *cs)
            if (i == (len-1) ) {
                ack = 0;
            }
-            printf("*    i=%2d, ack=%d, data=", i, ack);
+            // printf("*    i=%2d, ack=%d, data=", i, ack);
             data[i] = pixy_interface->read(ack);     // 1 = acknowledge received data. Last read should have ACK=0
-            printf("0x%hhx\n", data[i]);
+            // printf("0x%hhx\n", data[i]);
             rxn++;
             if (cs)
                 *cs += data[i];
