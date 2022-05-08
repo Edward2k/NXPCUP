@@ -6,6 +6,7 @@ void pulsewidth_test(void);
 void servo_test(void);
 void throttle_test(void);
 void test_pixy(void);
-
+void set_servo(double servo);
+void set_speed(double speed);
 
 #endif

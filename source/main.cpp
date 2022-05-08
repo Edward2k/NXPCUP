@@ -2,6 +2,7 @@
 #include "MK66F18.h"
 #include "board_fmuk66.h"
 //#include "mbed_thread.h"
+#include "mbed_thread.h"
 #include "pixy.h"
 #include "board_test.h"
 #include "pixyfeatures.h"
@@ -36,6 +37,20 @@ void wait_for_safety_switch(void) {
     }  
 }
 
+
+void test_drive() {
+    Pixy2 *pixy = new Pixy2();
+    Pixy2Features pf = Pixy2Features(*pixy);
+    while (1) {
+        pf.getMainFeatures();
+        float speed =  (pf.vectors[0].m_y1 - pf.vectors[0].m_y0)/50.0f;
+        float steer =  (pf.vectors[0].m_x1 - pf.vectors[0].m_x0)/50.0f;
+        set_servo(-steer);
+        set_speed(0.65f);
+        thread_sleep_for(20);
+    }
+}
+
 //
 //      M A I N
 //
@@ -58,6 +73,8 @@ int main()
         // Just a test of the random number generator
         RNGA_GetRandomData(RNG, rng_data, 1);
         printf("* RNG: %08X\n", rng_data[0]);
+        wait_for_safety_switch();
+        test_drive();
 
         wait_for_safety_switch();
         Pixy2 *pixy = new Pixy2();
