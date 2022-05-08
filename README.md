@@ -40,7 +40,7 @@ Follow the below steps chronologically.
 2) Open MbedStudio and perform setup (login and follow the tutorial if you like)
 3) Click on `Open Workspace` and open the repository of the the git repo just cloned
 4) At the bottom of MbedStudio, you'll see a list of libraries. You'll see the `fix` icon warning you out-of-sync libraries. Press Fix and let them install. 
-5) Apply the patches. To do so, copy and paste the following commands from the top-directory of the repo.
+5) Apply the patches. To do so, first click Terminal > New Terminal. Then copy and paste the following commands from the top-directory of the repo.
 ```bash
 cd FastPWM
 git apply ../patches/mbed-os_fmuk66-FastPWM.patch
@@ -50,7 +50,7 @@ git apply ../patches/mbed-os_fmuk66-PinNames.patch
 cd ..
 ```
 If you get the warning `1 line adds whitespace errors.`, that is fine  
-6) Plug in the car via the JLink USB cable. The car should be automatically recognized by MbedStudio. If not, select `FMUK66` as target on the left side.
+6) Plug in the car via the JLink USB cable. The car should be automatically recognized by MbedStudio. If not, select `FMUK66` as target on the left side.  
 7) Hit the hammer icon on the left side to build the project. This is will likely take a long time the first time as it is compiling an entire OS for the target. Subsequent builds will be much faster. You'll know it worked if the output pane reads 
 ```none
 Total Static RAM memory (data + bss): 12942(+12942) bytes
