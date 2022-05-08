@@ -2,34 +2,25 @@
 #include "board_fmuk66.h"
 #include "board_test.h"
 
-double get_pwm(double value, uint16_t center, uint16_t differ) {
+int get_pwm(double value, uint16_t center, uint16_t differ) {
     if (value < -1.0) value = -1.0;
     if (value >  1.0) value =  1.0;
 
-    double pwm_value = center + value * differ;
-    printf("pwm_value: %f\n", pwm_value);
+    int pwm_value = center + value * differ;
+    printf("pwm_value: %d\n", pwm_value);
     return pwm_value;
 }
 
 void set_servo(double servo) {
-    double servo_pwm = get_pwm(servo, 2025, 325);
-    fmu_ch2.pulsewidth(servo_pwm/1000000U);
-    
-    // CAUTION: When using PwmOut() a delay of 1ms caused erratic servo behaviour which destroyed my plastic-gear servo - See comment on top of board_fmuk66.h about Mbed and PWM. 
-    //          DO NOT SET LOWER THAN, say, 10, when using PwmOut() instead of FastPWM.
-    const uint16_t sleep_delay = 10;
-    thread_sleep_for(sleep_delay);
+    int servo_pwm = get_pwm(servo, 1750, 325);
+    fmu_ch2.pulsewidth_us(servo_pwm);
 }
 
 void set_speed(double speed) {
-    double speed_pwm = get_pwm(speed, 1600, 400);
-    fmu_ch4.pulsewidth(speed_pwm/1000000U);
-    
-    const uint16_t sleep_delay = 10;
-    thread_sleep_for(sleep_delay);
+    int speed_pwm = get_pwm(speed, 1600, 400);
+    fmu_ch4.pulsewidth_us(speed_pwm);
 }
 
-// FIXME: change to FastPWM (see throttle_test on how to do that. Needs a scope to verify correct servo timing)
 void servo_test(void)
 {
     printf("* servo_test(): \n");
@@ -79,7 +70,6 @@ void servo_test(void)
 void throttle_test(void)
 {
     printf("* throttle_test():\n");
-    // FastPWM fmu_ch4(FMU_CH4_PIN, 64); // prescaler 64 works for a period of 20ms
     fmu_ch4.period(0.02);
 
     // Start with brake mode (ESC should stop beeping since there is a servo signal present)
@@ -120,8 +110,6 @@ void throttle_test(void)
     ui_led_red = 0;
     thread_sleep_for(1000);
 }
-
-
 
 // @brief       Manually test the PWM timings with a scope. Turns out everything is 0.75x off.
 void pulsewidth_test(void)
