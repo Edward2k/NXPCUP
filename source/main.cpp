@@ -46,9 +46,6 @@ void pause(void)
     while ( safety_switch) {}
 }
 
-//
-//      M A I N
-//
 int main()
 {
     uint32_t rng_data[1];
@@ -59,36 +56,44 @@ int main()
     printf("\x1B[2J");          // Clear screen on RTT terminal
 
     //pulsewidth_test();
+    
+    wait_for_safety_switch();
+    printf("\x1B[2J");          // Clear screen on RTT terminal
+    board_debug_intro();
 
+    // Just a test of the random number generator
+    RNGA_GetRandomData(RNG, rng_data, 1);
+    printf("* RNG: %08X\n", rng_data[0]);
+
+    wait_for_safety_switch();
+    Pixy2 *pixy = new Pixy2();
+    pixy->init();
+    pixy->test();
+    Pixy2Features pf = Pixy2Features(*pixy);
+    
+    fmu_ch2.period_ms(20);
+    thread_sleep_for(100);
+    fmu_ch4.period_ms(20);  // FastPWM fmu_ch4(FMU_CH4_PIN, 64); // prescaler 64 works for a period of 20ms
+    thread_sleep_for(100);
+
+    set_servo(0.0);
+    set_speed(0.0);
+    
     while (1) {
         if (safety_switch) pause();
         
-        wait_for_safety_switch();
-        printf("\x1B[2J");          // Clear screen on RTT terminal
-        board_debug_intro();
-
-        // Just a test of the random number generator
-        RNGA_GetRandomData(RNG, rng_data, 1);
-        printf("* RNG: %08X\n", rng_data[0]);
-
-        wait_for_safety_switch();
-        Pixy2 *pixy = new Pixy2();
-        pixy->init();
-        pixy->test();
-        Pixy2Features pf = Pixy2Features(*pixy);
         pf.getAllFeatures();
         printf("Counted %d vectors\n", pf.numVectors);
-        for (int i = 0; i < pf.numVectors; i++) {
-            pf.vectors[i].print(); 
-            printf("\n");       
-        }
-        printf("* End Pixy test\n");
 
-        wait_for_safety_switch();
-        servo_test();
+        // the vectors are stored in pf.vectors
+        Vector vec = pf.vectors[0];
 
-        wait_for_safety_switch();
-        throttle_test();
+        /*
+            calculate servo position and motor speed here
+        */
+
+        set_servo(0.0); // [left, right] = [1.0, -1.0]
+        set_speed(0.0); // [reverse, forward] = [-1.0, 1.0]
     }
 }
 
