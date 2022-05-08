@@ -18,7 +18,8 @@
 //      - http://os.mbed.com/users/Sissors/code/FastPWM/
 
 
-void wait_for_safety_switch(void) {
+void wait_for_safety_switch(void)
+{
     printf("* --- Press safety switch to continue ---\n");
     buzz(1800, 100);
 
@@ -36,6 +37,15 @@ void wait_for_safety_switch(void) {
     }  
 }
 
+void pause(void)
+{
+    set_servo(0.0);
+    set_speed(0.0);
+    while ( safety_switch) {}
+    while (!safety_switch) {}
+    while ( safety_switch) {}
+}
+
 //
 //      M A I N
 //
@@ -51,6 +61,8 @@ int main()
     //pulsewidth_test();
 
     while (1) {
+        if (safety_switch) pause();
+        
         wait_for_safety_switch();
         printf("\x1B[2J");          // Clear screen on RTT terminal
         board_debug_intro();
